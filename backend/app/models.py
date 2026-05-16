@@ -14,9 +14,12 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    password = Column(String, nullable=False)
 
-    profiles = relationship("UserProfile", back_populates="user")
+    profiles = relationship("UserProfile", back_populates="user", cascade="all, delete-orphan")
+    learning_materials = relationship("LearningMaterial", back_populates="user", cascade="all, delete-orphan")
+    job_listings = relationship("JobListing", back_populates="user", cascade="all, delete-orphan")
+    routine_tasks = relationship("RoutineTask", back_populates="user", cascade="all, delete-orphan")
+    mental_health_entries = relationship("MentalHealthEntry", back_populates="user", cascade="all, delete-orphan")
 
 
 class UserProfile(Base):
@@ -37,18 +40,22 @@ class LearningMaterial(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     title = Column(String, nullable=False)
-    description = Column(String, nullable=False)
+    description = Column(String, nullable=True)
     content_url = Column(String, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     entry_text = Column(Text, nullable=False)
 
     user = relationship("User", back_populates="learning_materials")
 
-    def dict(self):  # Custom method to return a dictionary representation
+    def dict(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "entry_text": self.entry_text
+            "title": self.title,
+            "description": self.description,
+            "content_url": self.content_url,
+            "entry_text": self.entry_text,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
 
@@ -60,17 +67,22 @@ class JobListing(Base):
     title = Column(String, nullable=False)
     company = Column(String, nullable=False)
     location = Column(String, nullable=False)
-    description = Column(String, nullable=False)
+    description = Column(String, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     entry_text = Column(Text, nullable=False)
 
-    user = relationship("User", back_populates="Job_listings")
+    user = relationship("User", back_populates="job_listings")
 
-    def dict(self):  # Custom method to return a dictionary representation
+    def dict(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "entry_text": self.entry_text
+            "title": self.title,
+            "company": self.company,
+            "location": self.location,
+            "description": self.description,
+            "entry_text": self.entry_text,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
 
@@ -83,12 +95,14 @@ class RoutineTask(Base):
     schedule_time = Column(DateTime, nullable=False)
     entry_text = Column(Text, nullable=False)
 
-    user = relationship("User", back_populates="Routine_tasks")
+    user = relationship("User", back_populates="routine_tasks")
 
-    def dict(self):  # Custom method to return a dictionary representation
+    def dict(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
+            "task_name": self.task_name,
+            "schedule_time": self.schedule_time.isoformat() if self.schedule_time else None,
             "entry_text": self.entry_text
         }
 
@@ -105,9 +119,12 @@ class MentalHealthEntry(Base):
 
     user = relationship("User", back_populates="mental_health_entries")
 
-    def dict(self):  # Custom method to return a dictionary representation
+    def dict(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "entry_text": self.entry_text
+            "mood": self.mood,
+            "notes": self.notes,
+            "entry_text": self.entry_text,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }

@@ -38,10 +38,10 @@ Neuro-Assist follows a scalable and modular architecture with separate frontend,
 Neuro-Assist Project Structure:
 
 📂 neuro_assist/
-│── 📂 frontend/ (React.js & Flutter UI)
-│── 📂 backend/ (FastAPI, Flask, AI Models)
-│── 📂 database/ (PostgreSQL, schema.sql)
-│── 📂 tests/ (Unit & Integration Tests)
+│── 📂 frontend/ (React.js Web & Flutter Mobile UI)
+│── 📂 backend/ (FastAPI API Server)
+│── 📂 database/ (PostgreSQL, schema.sql, db.py connection)
+│── 📂 tests/ (Unit & Integration Tests targeting port 8000)
 │── 📜 README.md
 ```
 
@@ -49,9 +49,9 @@ Neuro-Assist Project Structure:
 | Component        | Technology Used      |
 |-----------------|---------------------|
 | Frontend        | React.js, Flutter   |
-| Backend         | FastAPI, Flask, Python |
+| Backend         | FastAPI, Python     |
 | Database        | PostgreSQL          |
-| AI Models       | Google Gemini 2.0, Cloud Vertex AI |
+| AI Models       | Google Gemini 2.0 (via lightweight request API) |
 | Security        | AES Encryption, JWT, HTTPS |
 | Cloud Services  | Google Cloud, Vultr |
 
@@ -74,9 +74,9 @@ Neuro-Assist Project Structure:
 +----------------------------------+
 |  📱 Mobile App (Flutter) | 🖥️ Web UI (React) |
 +----------------------------------+
-|      Backend API (FastAPI, Flask) |
+|          Backend API (FastAPI)   |
 +----------------------------------+
-|     AI Processing (Gemini 2.0)    |
+|   AI Processing (Gemini 2.0 API)  |
 +----------------------------------+
 | Database (PostgreSQL, Redis Cache)|
 +----------------------------------+
@@ -84,7 +84,7 @@ Neuro-Assist Project Structure:
 
 ### **2️⃣ Data Flow Diagram (DFD)**
 ```plaintext
-User → UI → API Gateway → Backend → AI Models → Database → Response → UI
+User → UI → API Gateway → FastAPI → Gemini 2.0 → Database → Response → UI
 ```
 
 ---
@@ -92,29 +92,31 @@ User → UI → API Gateway → Backend → AI Models → Database → Response 
 ## 🚀 Installation & Setup
 
 ### **Prerequisites**
-- Python 3.9+
+- Python 3.12+
 - Node.js 18+
 - PostgreSQL
-- Flutter SDK
-- Google Cloud SDK
+- Flutter SDK (optional, for mobile)
 
 ### **Backend Setup**
 ```sh
-cd backend
+cd backend/app
 python -m venv venv
 source venv/bin/activate  # On Windows use: venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn main:app --reload
+python main.py
 ```
+*(FastAPI server automatically binds database tables and hosts on http://localhost:8000)*
 
-### **Frontend Setup**
+### **Web Frontend Setup**
 ```sh
 cd frontend/web
 npm install
 npm start
 ```
+*(Web frontend boots on http://localhost:3000 connecting to http://localhost:8000)*
 
-### **Database Setup**
+### **Database Setup (Manual Option)**
+The backend automatically creates tables on start, but you can manually initialize Postgres via:
 ```sh
 psql -U postgres -d neuro_assist -f database/schema.sql
 ```
@@ -123,9 +125,13 @@ psql -U postgres -d neuro_assist -f database/schema.sql
 
 ## 🛠️ Testing
 
-To run unit and integration tests:
+To run the standalone unit and integration test scripts:
 ```sh
-pytest tests/
+# Run backend tests
+python tests/backend_tests.py
+
+# Run integration tests
+python tests/integration_tests.py
 ```
 
 ---
@@ -142,4 +148,3 @@ pytest tests/
 For any queries or collaboration, reach out via [prashantbansal529@gmail.com](mailto:email@example.com) or visit our [GitHub Repository](https://github.com/neuro-assist).
 
 Let's build an inclusive digital world together! 🚀
-
